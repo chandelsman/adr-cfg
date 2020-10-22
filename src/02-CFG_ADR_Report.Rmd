@@ -1,0 +1,161 @@
+---
+title: ""
+author: ""
+output:
+  html_document: default
+params:
+  quarter:
+    choices:
+    - Quarter 1
+    - Quarter 2
+    - Quarter 3
+    - Quarter 4
+    input: select
+    label: Quarter
+    value: Quarter 1
+  year:
+    choices:
+    - 2020
+    - 2021
+    - 2022
+    - 2023
+    - 2024
+    - 2025
+    input: select
+    label: Year
+    value: 2020
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE,
+                      message = FALSE,
+                      warning = FALSE)
+knitr::opts_knit$set(root.dir = "..")
+```
+
+```{r packages, message = FALSE, warning = FALSE}
+library(tidyverse)
+library(lubridate)
+library(kableExtra)
+```
+
+```{r warning=FALSE}
+# load data after manual entry of "evaluate" cases
+adr_data <- readxl::read_excel("./data/HarmonyADR_final.xlsx")
+
+# calculate ADR for each provider as:
+# sum of cases with tubular adenomas, tubulovillous adenomas, and carcinomas
+# divided by the sum of all non-serrated adenomas and screening colonoscopies
+
+# calculate numerator (i.e., performance met)
+adr_num <- adr_data %>%
+  select(provider, sex, category) %>%
+  count(provider, sex, category) %>%
+  pivot_wider(names_from = category, values_from = n) %>%
+  group_by(provider, sex) %>%
+  summarize(
+    sum_ta = sum(ta, na.rm = TRUE),
+    sum_ta_ssa = sum(ta_ssa, na.rm = TRUE),
+    sum_carcinoma = sum(carcinoma, na.rm = TRUE),
+    Numerator = sum(c(ta, ta_ssa, carcinoma), na.rm = TRUE)
+  )
+
+# calculate denominator (performance met + screening - performance not met)
+adr_den <- adr_data %>%
+  select(provider, sex, category) %>%
+  count(provider, sex, category) %>%
+  pivot_wider(names_from = category, values_from = n) %>%
+  group_by(provider, sex) %>%
+  summarize(Denominator = sum(c(ta, ta_ssa, carcinoma, screen), na.rm = TRUE))
+
+# calculate ADR (serrated adenoma only results are excluded)
+adr <- adr_data %>%
+  select(provider, sex, category) %>%
+  count(provider, sex, category) %>%
+  pivot_wider(names_from = category, values_from = n) %>%
+  group_by(provider, sex) %>%
+  summarize(adr = (sum(c(
+    ta, ta_ssa, carcinoma
+  ), na.rm = TRUE)) / (sum(c(
+    ta, ta_ssa, carcinoma, screen
+  ), na.rm = TRUE)) * 100) %>%
+  mutate_at(3, ~ round(., 2))
+
+# merge numerator, denominator, and ADR into common table
+adr_table <- adr_num %>%
+  select(-c(sum_ta, sum_ta_ssa, sum_carcinoma)) %>%
+  left_join(adr_den, by = c("provider", "sex")) %>%
+  left_join(adr, by = c("provider", "sex")) %>%
+  rename(Provider = provider,
+         Sex = sex,
+         `ADR (%)` = adr)
+
+# calculate SSADR for each provider as:
+# sum of tubular, tubulovillous, and serrated adenomas plus carcinomas
+# divided by total screening colonoscopies
+
+# calculate numerator (i.e., performance met + serrated adenomas)
+ssadr_num <- adr_data %>%
+  select(provider, sex, category) %>%
+  count(provider, sex, category) %>%
+  pivot_wider(names_from = category, values_from = n) %>%
+  group_by(provider, sex) %>%
+  summarize(Numerator = sum(c(ta_ssa, ssa), na.rm = TRUE))
+
+# calculate denominator (performance met + screening + serrated adenomas)
+ssadr_den <- adr_data %>%
+  select(provider, sex, category) %>%
+  count(provider, sex, category) %>%
+  pivot_wider(names_from = category, values_from = n) %>%
+  group_by(provider, sex) %>%
+  summarize(Denominator = sum(c(ta, ta_ssa, ssa, screen), na.rm = TRUE))
+
+# calculate SSADR (all serrated adenoma only results are included)
+ssadr <- adr_data %>%
+  select(provider, sex, category) %>%
+  count(provider, sex, category) %>%
+  pivot_wider(names_from = category, values_from = n) %>%
+  group_by(provider, sex) %>%
+  summarize(ssadr = (sum(c(ta_ssa, ssa), na.rm = TRUE)) / (sum(c(
+    ta, ta_ssa, ssa, screen
+  ), na.rm = TRUE)) * 100) %>%
+  mutate_at(3, ~ round(., 2))
+
+# merge numerator, denominator, and SSADR into common table
+ssadr_table <- ssadr_num %>%
+  left_join(ssadr_den, by = c("provider", "sex")) %>%
+  left_join(ssadr, by = c("provider", "sex")) %>%
+  rename(Provider = provider,
+         Sex = sex,
+         `SSADR (%)` = ssadr)
+```
+
+```{r, echo=FALSE, out.width="20%", fig.align="center"}
+# knitr::include_graphics("../sp-logo.png")
+```
+<div style = "text-align: center">
+
+![](../sp-logo.png){width=25%}
+
+### Adenoma Detection Rate Report
+#### Harmony Surgery Center
+#### `r params$year` `r params$quarter`
+
+</div>
+
+```{r}
+kable(adr_table,  
+      caption = "ADR by Provider for all Screening Colonoscopies") %>% 
+  kable_styling(bootstrap_options = "stripe", full_width = T)
+```
+
+```{r}
+kable(ssadr_table, 
+      caption = "SSADR by Provider for all Screening Colonoscopies") %>% 
+  kable_styling(bootstrap_options = "stripe", full_width = T) %>% 
+   footnote(c("ADR and SSADR were calculated in accordance with the 2018 CMS Guidelines.",
+              "Performance metrics were calculated from 2,948 screening colonoscopies provided to Summit Pathology by Harmony Surgery Center"),
+            threeparttable = TRUE)
+```
