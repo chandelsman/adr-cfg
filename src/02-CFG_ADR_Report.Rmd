@@ -1,6 +1,6 @@
 ---
-title: ""
-author: ""
+title: ''
+author: ''
 output:
   html_document: default
 params:
@@ -134,10 +134,11 @@ ssadr <- adr_data %>%
 ![](../sp-logo.png){width=25%}
 
 ### Adenoma Detection Rate Report
-#### Harmony Surgery Center
-#### `r params$year` `r params$quarter`
+### Harmony Surgery Center
+### `r params$year` `r params$quarter`
 
 </div>
+<br><br>
 
 ```{r adr}
 adr_table %>% 
@@ -146,7 +147,7 @@ adr_table %>%
      rowname_col = "Sex"
   ) %>% 
   tab_header(
-    title = md("**ADR by Provider for All Screening Colonoscopies**")
+    title = md("**ADR All Screening Colonoscopies**")
   ) %>% 
   fmt_percent(
     columns = vars(ADR),
@@ -156,13 +157,20 @@ adr_table %>%
     align = "right",
     columns = everything()
   ) %>% 
+  tab_source_note(
+    source_note = md("*All diagnoses were rendered by Pathologists of Summit Pathology from specimens provided by Harmony Surgery Center. Records of all screening colonoscopies were provided to Summit Pathology by Harmony Surgery Center. ADR was calculated in accordance with the 2018 CMS Guidelines (qpp.cms.gov/docs/QPP_quality_measure_specifications/Claims-Registry-Measures/2018_Measure_343_Registry.pdf).*")
+  ) %>% 
   tab_options(
+    summary_row.padding = px(2),
+    row_group.font.weight = "bold",
+    row_group.padding = px(8),
     column_labels.font.weight = "bold",
-    table.width = pct(65)
+    table.width = pct(75)
   )
 ```
 
-<div "page-break-before: always"> 
+<div style = "page-break-before: always"> 
+<br><br><br>
 
 ```{r}
 ssadr_table %>% 
@@ -171,7 +179,7 @@ ssadr_table %>%
      rowname_col = "Sex"
   ) %>% 
   tab_header(
-    title = md("**SSADR by Provider for All Screening Colonoscopies**")
+    title = md("**SSADR for All Screening Colonoscopies**")
   ) %>% 
   fmt_percent(
     columns = vars(SSADR),
@@ -180,11 +188,16 @@ ssadr_table %>%
   cols_align(
     align = "right",
     columns = everything()
-  ) %>%
+  ) %>% 
+  tab_source_note(
+    source_note = md("*All diagnoses were rendered by Pathologists of Summit Pathology from specimens provided by Harmony Surgery Center. Records of all screening colonoscopies were provided to Summit Pathology by Harmony Surgery Center. SSADR was calculated in accordance with the 2018 CMS Guidelines (qpp.cms.gov/docs/QPP_quality_measure_specifications/Claims-Registry-Measures/2018_Measure_343_Registry.pdf).*")
+  ) %>% 
   tab_options(
+    summary_row.padding = px(2),
+    row_group.font.weight = "bold",
+    row_group.padding = px(8),
     column_labels.font.weight = "bold",
-    table.width = pct(65)
+    table.width = pct(75)
   )
 ```
-
 </div>
