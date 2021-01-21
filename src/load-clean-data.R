@@ -78,3 +78,67 @@ colonoscopy <-
   client_clean %>%
   left_join(ligo_clean,
             by = c("match_name" = "match_name", "dos_client" = "dos_ligo"))
+
+# Classify adenomas using text in the diagnosis field
+neg_results <-
+  str_c(
+    c(
+      "negative for hyperplastic and adenomatous change",
+      "negative for adenomatous change and malignancy",
+      "negative for high-grade dysplasia and malignancy",
+      "negative for high grade dysplasia and malignancy",
+      "negative for malignancy",
+      "negative for dysplasia and malignancy",
+      "negative for adenomatous epithelium",
+      "negative for active gastritis",
+      "no invasive carcinoma",
+      "no invasive adenocarcinoma",
+      "no definitive carcinoma",
+      "no definite invasive carcinoma",
+      "no high-grade dysplasia or carcinoma",
+      "no high-grade dysplasia or invasive carcinoma",
+      "negative for intestinal metaplasia, dysplasia, and carcinoma",
+      "negative for intestinal metaplasia, dysplasia and carcinoma",
+      "negative for high-grade dysplasia and invasive carcinoma",
+      "negative for dysplasia and carcinoma"
+    ),
+    collapse = "|"
+  )
+
+colon_class <-
+  colonoscopy %>%
+  mutate(
+    diagnosis =
+      str_replace_all(diagnosis, regex(neg_results, ignore_case = TRUE),
+                      "xxxxx"),
+    TA = str_detect(diagnosis, fixed("tubul", ignore_case = TRUE)) |
+      str_detect(diagnosis, fixed("villous", ignore_case = TRUE)),
+    SSA = str_detect(diagnosis, fixed("serrated", ignore_case = TRUE)),
+    negative = str_detect(diagnosis, fixed("negative", ignore_case = TRUE)),
+    carcinoma = str_detect(diagnosis, fixed("carcinoma", ignore_case = TRUE)),
+    category = case_when(
+      diagnosis %in% NA ~ "screen",
+      carcinoma == TRUE ~ "evaluate",
+      TA == TRUE  & SSA == FALSE ~ "ta",
+      TA == FALSE & SSA == FALSE ~ "screen",
+      TA == TRUE  & SSA == TRUE & negative == FALSE ~ "ta_ssa",
+      TA == FALSE & SSA == TRUE & negative == FALSE ~ "ssa",
+      TA == TRUE  & SSA == TRUE & negative == TRUE  ~ "evaluate",
+      TA == FALSE & SSA == TRUE & negative == TRUE  ~ "evaluate",
+      TRUE ~ "check_code"
+    )
+  )
+
+# write data to Excel file and manually evaluate unresolved classifications
+writexl::write_xlsx(colon_class, here("output", "2020q4-ADR-review.xlsx"))
+
+# write file containing all screening colonoscopies to send to Dr. Sears
+writexl::write_xlsx(colonoscopy,
+                    here("output", "2020q4-colonoscopies-CFG-Harmony.xlsx"))
+
+###############################################################################
+# manually assign all cases categorized as "evaluate" and save file to data 
+# folder as:
+# HarmonyADR-final-q#.xlsx
+# Open 02-CFG_ADR_Report.Rmd to finish analysis
+###############################################################################
