@@ -6,7 +6,7 @@ output:
 params:
   year:
     label: "Year"
-    value: 2021
+    value: 2020
     input: numeric
     min: 2000
     max: 2099
@@ -112,7 +112,10 @@ ligo_clean <-
 colonoscopy <-
   client_clean %>%
   left_join(ligo_clean,
-            by = c("match_name" = "match_name", "dos_client" = "dos_ligo"))
+            by = c("match_name" = "match_name", "dos_client" = "dos_ligo")) %>%
+  mutate(yr = year(dos_client),
+         qtr = quarter(dos_client)) %>%
+  filter(yr == params$year & qtr == params$quarter)
 ```
 
 
@@ -148,7 +151,6 @@ colon_class <-
     diagnosis =
       str_replace_all(diagnosis, regex(neg_results, ignore_case = TRUE),
                       "xxxxx"),
-    qtr = quarter(dos_client),
     TA = str_detect(diagnosis, fixed("tubul", ignore_case = TRUE)) |
       str_detect(diagnosis, fixed("villous", ignore_case = TRUE)),
     SSA = str_detect(diagnosis, fixed("serrated", ignore_case = TRUE)),
@@ -165,7 +167,7 @@ colon_class <-
       TA == FALSE & SSA == TRUE & negative == TRUE  ~ "evaluate",
       TRUE ~ "check_code"
     )
-  )
+  ) 
 ```
 
 
