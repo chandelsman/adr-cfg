@@ -176,7 +176,7 @@ colon_class <-
 writexl::write_xlsx(colon_class, here(
   "output",
   paste0(params$year, "q", params$quarter,
-         "ADR-review.xlsx")
+         "-ADR-review.xlsx")
 ))
 
 # write file containing all screening colonoscopies if requested by Dr. Sears
