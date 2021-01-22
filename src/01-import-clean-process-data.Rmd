@@ -1,18 +1,49 @@
-### ADR Report: Centers for Gastroenterology
+---
+title: "...Processing ADR Data..."
+output:
+  html_document:
+    df_print: paged
+params:
+  year:
+    label: "Year"
+    value: 2021
+    input: numeric
+    min: 2000
+    max: 2099
+    step: 1
+  quarter:
+    label: "Quarter"
+    value: 4
+    input: numeric
+    min: 1
+    max: 4
+    step: 1
+editor_options:
+  chunk_output_type: console
+---
 
-# This script combines client provided records of screening colonoscopies with 
-# LigoLab records of biopsies and assembles a dataset that is used to label 
-# each record as a screening colonoscopy, tubular adenomoa, serrated adenoma, 
-# malignancy, or needing manual interpretation. After manually verifying the 
-# output, the combined data are used by the Rmarkdown script to produce the ADR 
-# for the client. 
+<!-- ADR Report: Centers for Gastroenterology
 
-# Load libraries ----------------------------------------------------------
+This script combines client provided records of screening colonoscopies with 
+LigoLab records of biopsies and assembles a dataset that is used to label 
+each record as a screening colonoscopy, tubular adenomoa, serrated adenoma, 
+malignancy, or needing manual interpretation. After manually verifying the 
+output, the combined data are used by the Rmarkdown script to produce the ADR 
+for the client.  -->
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+
+```{r load libraries, include=FALSE}
 library(tidyverse)
 library(lubridate)
 library(here)
+```
 
-# Import and clean data ---------------------------------------------------
+
+```{r import clean client data, include=FALSE}
 # Client data provided by CFG -----
 client_raw <-
   list.files(path = here("data"),
@@ -33,8 +64,10 @@ client_clean <-
   rename(sex = Gender) %>%
   filter(age >= 50) %>%
   select(provider, match_name, dos_client, dob_client, age, sex)
+```
 
-# Summit data from LigoLab -----
+
+```{r import clean LigoLab data, include=FALSE}
 ligo_raw <-
   list.files(path = here("data"),
              pattern = "(\\d){4}\\D\\d-ligo",
@@ -71,15 +104,19 @@ ligo_clean <-
            extra = "drop") %>%
   filter(age >= 50, colon == TRUE) %>%
   select(-c(age, sex, provider, dob, dos, client, doctor, name, f_name, colon))
+```
 
-# Merge client and LigoLab data
+
+```{r merge datasets, include=FALSE}
 # Resulting dataset includes **all** screening colonoscopies
 colonoscopy <-
   client_clean %>%
   left_join(ligo_clean,
             by = c("match_name" = "match_name", "dos_client" = "dos_ligo"))
+```
 
-# Classify adenomas using text in the diagnosis field
+
+```{r classify adenomas, include=FALSE}
 neg_results <-
   str_c(
     c(
@@ -111,6 +148,7 @@ colon_class <-
     diagnosis =
       str_replace_all(diagnosis, regex(neg_results, ignore_case = TRUE),
                       "xxxxx"),
+    qtr = quarter(dos_client),
     TA = str_detect(diagnosis, fixed("tubul", ignore_case = TRUE)) |
       str_detect(diagnosis, fixed("villous", ignore_case = TRUE)),
     SSA = str_detect(diagnosis, fixed("serrated", ignore_case = TRUE)),
@@ -128,17 +166,54 @@ colon_class <-
       TRUE ~ "check_code"
     )
   )
+```
 
+
+```{r write files, include=FALSE}
 # write data to Excel file and manually evaluate unresolved classifications
-writexl::write_xlsx(colon_class, here("output", "2020q4-ADR-review.xlsx"))
+writexl::write_xlsx(colon_class, here(
+  "output",
+  paste0(params$year, "q", params$quarter,
+         "ADR-review.xlsx")
+))
 
-# write file containing all screening colonoscopies to send to Dr. Sears
-writexl::write_xlsx(colonoscopy,
-                    here("output", "2020q4-colonoscopies-CFG-Harmony.xlsx"))
+# write file containing all screening colonoscopies if requested by Dr. Sears
+writexl::write_xlsx(colonoscopy, here(
+  "output",
+  paste0(params$year, "q", params$quarter,
+    "-colonoscopies-CFG-Harmony.xlsx"
+  )
+))
+```
+---
+## All data were processed successfully!
 
-###############################################################################
-# manually assign all cases categorized as "evaluate" and save file to data 
-# folder as:
-# HarmonyADR-final-q#.xlsx
-# Open 02-CFG_ADR_Report.Rmd to finish analysis
-###############################################################################
+
+### 1) Go to the project ouput folder and open:
+
+> `r params$year`q`r params$quarter`-ADR-review.xlsx
+
+### 2) Manually review and score cases where
+
+> "category" = "evaluate"
+
+#### Filter the "category" column to show cases scored as "evaluate"  
+
+**Read the diagnosis and score as one of the options below**  
+
+|Category  | Definition |  
+|----------|------------|  
+|ta        | tubular adenoma present |  
+|ta_ssa    | tubular and serrated adenoma present |  
+|ssa       | serrated adenoma present |  
+|carcinoma | carcinoma or malignancy present |  
+|screen    | negative for all of the above |  
+
+### 3) Save the revised file to the project data folder as:
+
+> `r params$year`q`r params$quarter`-ADR-scored.xlsx
+
+### 4) Knit the "02-CFG-ADR-Report.RMD" R markdown file to produce ADR Reports
+
+- Be sure to knit with parameters and choose the year and quarter
+- Send the completed report to Dr. Sears (ssears@digestive-health.net)
