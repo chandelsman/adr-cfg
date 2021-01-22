@@ -6,13 +6,13 @@ output:
 params:
   quarter:
     choices:
-    - Quarter 1
-    - Quarter 2
-    - Quarter 3
-    - Quarter 4
+    - 1
+    - 2
+    - 3
+    - 4
     input: select
     label: Quarter
-    value: Quarter 1
+    value: 4
   year:
     choices:
     - 2020
@@ -38,12 +38,18 @@ knitr::opts_knit$set(root.dir = "..")
 ```{r packages, message = FALSE, warning = FALSE}
 library(tidyverse)
 library(lubridate)
+library(here)
 library(gt)
 ```
 
 ```{r warning=FALSE}
 # Load data after manual entry of "evaluate" cases
-adr_data <- readxl::read_excel("data/2020q3-ADR-final.xlsx")
+adr_data <-
+  readxl::read_excel(here(
+    "data",
+    paste0(params$year, "q", params$quarter, "-ADR-scored.xlsx")
+  )) %>% 
+  filter(!is.na(sex))
 
 # Calculate ADR for each provider as:
 #   sum of cases with tubular adenomas, tubulovillous adenomas, and carcinomas
@@ -135,7 +141,7 @@ ssadr <- adr_data %>%
 
 ### Adenoma Detection Rate Report
 ### Harmony Surgery Center
-### `r params$year` `r params$quarter`
+### `r params$year` Quarter `r params$quarter`
 
 </div>
 <br><br>
