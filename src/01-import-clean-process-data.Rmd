@@ -6,14 +6,14 @@ output:
 params:
   year:
     label: "Year"
-    value: 2020
+    value: 2021
     input: numeric
     min: 2000
     max: 2099
     step: 1
   quarter:
     label: "Quarter"
-    value: 4
+    value: 1
     input: numeric
     min: 1
     max: 4
@@ -47,18 +47,18 @@ library(here)
 # Client data provided by CFG -----
 client_raw <-
   list.files(path = here("data"),
-             pattern = "(\\d){4}\\D\\d-\\D\\d{2}\\.\\d+\\.xlsx",
+             pattern = "(\\d){4}\\D\\d-\\D\\d{2}\\.\\d+\\.csv",
              full.names = TRUE) %>%
-  sapply(readxl::read_excel, simplify = FALSE) %>%
+  sapply(readr::read_csv, simplify = FALSE) %>%
   bind_rows()
 
 client_clean <-
   client_raw %>%
   mutate(
-    dob_client = ymd(`Date of Birth`),
+    dob_client = mdy(`Date of Birth`),
     match_name = str_extract(client_raw$`Patient Name`, "^.*,\\s..."),
     provider = `Provider Name`,
-    dos_client = as_date(ymd_hms(`Exam Date`)),
+    dos_client = date(mdy_hm(`Exam Date`)),
     age = as.period(interval(start = dob_client, end = dos_client))$year
   ) %>%
   rename(sex = Gender) %>%
@@ -123,11 +123,15 @@ colonoscopy <-
 neg_results <-
   str_c(
     c(
+      "negative for definitive dysplasia and malignancy", 
       "negative for hyperplastic and adenomatous change",
       "negative for adenomatous change and malignancy",
+      "negative for high-grade dysplasia",
+      "negative for high grade dysplasia",
       "negative for high-grade dysplasia and malignancy",
       "negative for high grade dysplasia and malignancy",
       "negative for malignancy",
+      "negative for dysplasia", 
       "negative for dysplasia and malignancy",
       "negative for adenomatous epithelium",
       "negative for active gastritis",
@@ -140,7 +144,10 @@ neg_results <-
       "negative for intestinal metaplasia, dysplasia, and carcinoma",
       "negative for intestinal metaplasia, dysplasia and carcinoma",
       "negative for high-grade dysplasia and invasive carcinoma",
-      "negative for dysplasia and carcinoma"
+      "negative for dysplasia and carcinoma", 
+      "negative for diagnostic features of sessile serrated adenoma, conventional adenoma and malignancy", 
+      "negative for diagnostic features of hyperplastic polyp, sessile serrated adenoma, conventional adenoma and malignancy", 
+      "negative for polyp, active colitis, microscopic colitis, granulomas, dysplasia and malignancy"
     ),
     collapse = "|"
   )
