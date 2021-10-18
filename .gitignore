@@ -41,3 +41,6 @@ vignettes/*.pdf
 # Files with PHI
 /data/*
 /output/*
+
+# Apple desktop services files
+**.DS_Store

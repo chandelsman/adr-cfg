@@ -156,7 +156,7 @@ adr_table %>%
     title = md("**ADR All Screening Colonoscopies**")
   ) %>% 
   fmt_percent(
-    columns = vars(ADR),
+    columns = "ADR",
     decimals = 2
   ) %>% 
   cols_align(
@@ -188,7 +188,7 @@ ssadr_table %>%
     title = md("**SSADR for All Screening Colonoscopies**")
   ) %>% 
   fmt_percent(
-    columns = vars(SSADR),
+    columns = "SSADR",
     decimals = 2
   ) %>% 
   cols_align(
