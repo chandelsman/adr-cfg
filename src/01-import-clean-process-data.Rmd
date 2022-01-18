@@ -1,18 +1,19 @@
 ---
-title: "...Processing ADR Data..."
+title: '...Processing ADR Data...'
 output:
+  pdf_document: default
   html_document:
     df_print: paged
 params:
   year:
-    label: "Year"
+    label: Year
     value: 2021
     input: numeric
     min: 2000
     max: 2099
     step: 1
   quarter:
-    label: "Quarter"
+    label: Quarter
     value: 1
     input: numeric
     min: 1
