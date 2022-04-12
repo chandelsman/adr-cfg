@@ -1,13 +1,13 @@
 ---
 title: '...Processing ADR Data...'
 output:
-  pdf_document: default
+  # pdf_document: default
   html_document:
     df_print: paged
 params:
   year:
     label: Year
-    value: 2021
+    value: 2022
     input: numeric
     min: 2000
     max: 2099

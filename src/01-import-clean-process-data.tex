@@ -1,0 +1,145 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\title{\ldots Processing ADR Data\ldots{}}
+\author{}
+\date{\vspace{-2.5em}}
+
+\usepackage{amsmath,amssymb}
+\usepackage{lmodern}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\hypersetup{
+  pdftitle={\ldots Processing ADR Data\ldots{}},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+\urlstyle{same} % disable monospaced font for URLs
+\usepackage[margin=1in]{geometry}
+\usepackage{longtable,booktabs,array}
+\usepackage{calc} % for calculating minipage widths
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+
+\begin{document}
+\maketitle
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\hypertarget{all-data-were-processed-successfully}{%
+\subsection{All data were processed
+successfully!}\label{all-data-were-processed-successfully}}
+
+\hypertarget{go-to-the-project-ouput-folder-and-open}{%
+\subsubsection{1) Go to the project ouput folder and
+open:}\label{go-to-the-project-ouput-folder-and-open}}
+
+\begin{quote}
+2022q1-ADR-review.xlsx
+\end{quote}
+
+\hypertarget{manually-review-and-score-cases-where}{%
+\subsubsection{2) Manually review and score cases
+where}\label{manually-review-and-score-cases-where}}
+
+\begin{quote}
+``category'' = ``evaluate''
+\end{quote}
+
+\hypertarget{filter-the-category-column-to-show-cases-scored-as-evaluate}{%
+\paragraph{Filter the ``category'' column to show cases scored as
+``evaluate''}\label{filter-the-category-column-to-show-cases-scored-as-evaluate}}
+
+\textbf{Read the diagnosis and score as one of the options below}
+
+\begin{longtable}[]{@{}ll@{}}
+\toprule
+Category & Definition \\
+\midrule
+\endhead
+ta & tubular adenoma present \\
+ta\_ssa & tubular and serrated adenoma present \\
+ssa & serrated adenoma present \\
+carcinoma & carcinoma or malignancy present \\
+screen & negative for all of the above \\
+\bottomrule
+\end{longtable}
+
+\hypertarget{save-the-revised-file-to-the-project-data-folder-as}{%
+\subsubsection{3) Save the revised file to the project data folder
+as:}\label{save-the-revised-file-to-the-project-data-folder-as}}
+
+\begin{quote}
+2022q1-ADR-scored.xlsx
+\end{quote}
+
+\hypertarget{knit-the-02-cfg-adr-report.rmd-r-markdown-file-to-produce-adr-reports}{%
+\subsubsection{4) Knit the ``02-CFG-ADR-Report.RMD'' R markdown file to
+produce ADR
+Reports}\label{knit-the-02-cfg-adr-report.rmd-r-markdown-file-to-produce-adr-reports}}
+
+\begin{itemize}
+\tightlist
+\item
+  Be sure to knit with parameters and choose the year and quarter
+\item
+  Send the completed report to Dr.~Sears
+  (\href{mailto:ssears@digestive-health.net}{\nolinkurl{ssears@digestive-health.net}})
+\end{itemize}
+
+\end{document}
