@@ -14,7 +14,7 @@ params:
     step: 1
   quarter:
     label: Quarter
-    value: 1
+    value: 3
     input: numeric
     min: 1
     max: 4
@@ -191,7 +191,7 @@ writexl::write_xlsx(colon_class, here(
 writexl::write_xlsx(colonoscopy, here(
   "output",
   paste0(params$year, "q", params$quarter,
-    "-colonoscopies-CFG-Harmony.xlsx"
+    "-colonoscopies-CFG-Harmony-test.xlsx"
   )
 ))
 ```
