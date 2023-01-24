@@ -58,7 +58,8 @@ adr_num <- adr_data %>%
   count(provider, sex, category) %>%
   pivot_wider(names_from = category, values_from = n) %>%
   group_by(provider, sex) %>%
-  summarise(Numerator = sum(c(ta, ta_ssa)))
+  summarize(Numerator = sum(c(ta, ta_ssa)),
+            .groups = "drop")
 
 # Calculate denominator (performance met + screening - performance not met)
 adr_den <- adr_data %>%
@@ -66,7 +67,8 @@ adr_den <- adr_data %>%
   count(provider, sex, category) %>%
   pivot_wider(names_from = category, values_from = n) %>%
   group_by(provider, sex) %>%
-  summarise(Denominator = sum(c(ta, ta_ssa, screen)))
+  summarize(Denominator = sum(c(ta, ta_ssa, screen)), 
+            .groups = "drop")
 
 # Calculate ADR (serrated adenoma only results are excluded)
 adr <- adr_data %>%
@@ -74,7 +76,8 @@ adr <- adr_data %>%
   count(provider, sex, category) %>%
   pivot_wider(names_from = category, values_from = n) %>%
   group_by(provider, sex) %>%
-  summarise(adr = (sum(c(ta, ta_ssa))) / (sum(c(ta, ta_ssa, screen))))
+  summarize(adr = (sum(c(ta, ta_ssa))) / (sum(c(ta, ta_ssa, screen))),
+            .groups = "drop")
 
 # Merge numerator, denominator, and ADR into common table
 adr_table <- adr_num %>%
@@ -97,7 +100,8 @@ ssadr_num <- adr_data %>%
   count(provider, sex, category) %>%
   pivot_wider(names_from = category, values_from = n) %>%
   group_by(provider, sex) %>%
-  summarise(Numerator = sum(c(ta_ssa, ssa)))
+  summarize(Numerator = sum(c(ta_ssa, ssa)),
+            .groups = "drop")
 
 # Calculate denominator (performance met + screening + serrated adenomas)
 ssadr_den <- adr_data %>%
@@ -105,7 +109,8 @@ ssadr_den <- adr_data %>%
   count(provider, sex, category) %>%
   pivot_wider(names_from = category, values_from = n) %>%
   group_by(provider, sex) %>%
-  summarise(Denominator = sum(c(ta, ta_ssa, ssa, screen)))
+  summarize(Denominator = sum(c(ta, ta_ssa, ssa, screen)),
+            .groups = "drop")
 
 # Calculate SSADR (all serrated adenoma only results are included)
 ssadr <- adr_data %>%
@@ -113,9 +118,10 @@ ssadr <- adr_data %>%
   count(provider, sex, category) %>%
   pivot_wider(names_from = category, values_from = n) %>%
   group_by(provider, sex) %>%
-  summarise(ssadr = (sum(c(ta_ssa, ssa))) / (sum(c(
+  summarize(ssadr = (sum(c(ta_ssa, ssa))) / (sum(c(
     ta, ta_ssa, ssa, screen
-  ))))
+  ))),
+  .groups = "drop")
   
   # Merge numerator, denominator, and SSADR into common table
   ssadr_table <- ssadr_num %>%
@@ -141,7 +147,7 @@ ssadr <- adr_data %>%
 ### `r params$year` Quarter `r params$quarter`
 
 </div>
-<br><br>
+<br>
 
 ```{r adr}
 adr_table %>% 
@@ -172,7 +178,7 @@ adr_table %>%
   )
 ```
 
-<div style = "page-break-before: always"> 
+<!-- <div style = "page-break-before: always">  -->
 <br><br><br>
 
 ```{r}

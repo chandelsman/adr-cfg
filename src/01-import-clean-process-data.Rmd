@@ -226,4 +226,4 @@ writexl::write_xlsx(colonoscopy, here(
 ### 4) Knit the "02-CFG-ADR-Report.RMD" R markdown file to produce ADR Reports
 
 - Be sure to knit with parameters and choose the year and quarter
-- Send the completed report to Dr. Sears (ssears@digestive-health.net)
+- Send the completed report to Kevin Seely (kseely@cfgnoco.com) and Dr. Sears (ssears@digestive-health.net)

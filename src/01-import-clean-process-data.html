@@ -1568,23 +1568,17 @@ overflow-y: auto;
 border: 1px solid #ddd;
 border-radius: 4px;
 }
-.tabset-dropdown > .nav-tabs > li.active:before {
-content: "";
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+content: "\e259";
 font-family: 'Glyphicons Halflings';
 display: inline-block;
 padding: 10px;
 border-right: 1px solid #ddd;
 }
 .tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
-content: "";
-border: none;
-}
-.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
-content: "";
+content: "\e258";
 font-family: 'Glyphicons Halflings';
-display: inline-block;
-padding: 10px;
-border-right: 1px solid #ddd;
+border: none;
 }
 .tabset-dropdown > .nav-tabs > li.active {
 display: block;
@@ -1644,7 +1638,7 @@ for the client.  -->
 <div id="go-to-the-project-ouput-folder-and-open" class="section level3">
 <h3>1) Go to the project ouput folder and open:</h3>
 <blockquote>
-<p>2022q3-ADR-review.xlsx</p>
+<p>2022q4-ADR-review.xlsx</p>
 </blockquote>
 </div>
 <div id="manually-review-and-score-cases-where" class="section level3">
@@ -1691,7 +1685,7 @@ below</strong></p>
 <div id="save-the-revised-file-to-the-project-data-folder-as" class="section level3">
 <h3>3) Save the revised file to the project data folder as:</h3>
 <blockquote>
-<p>2022q3-ADR-scored.xlsx</p>
+<p>2022q4-ADR-scored.xlsx</p>
 </blockquote>
 </div>
 <div id="knit-the-02-cfg-adr-report.rmd-r-markdown-file-to-produce-adr-reports" class="section level3">
