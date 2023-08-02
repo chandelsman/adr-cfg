@@ -45,7 +45,7 @@ adr_data <-
   readxl::read_excel(here(
     "data",
     paste0(params$year, "q", params$quarter, "-ADR-scored.xlsx")
-  )) %>% 
+  )) |> 
   filter(!is.na(sex))
 
 # Calculate ADR for each provider as:
@@ -53,41 +53,41 @@ adr_data <-
 #   divided by the sum of all non-serrated adenomas and screening colonoscopies
 
 # Calculate numerator (i.e., performance met)
-adr_num <- adr_data %>%
-  select(provider, sex, category) %>%
-  count(provider, sex, category) %>%
-  pivot_wider(names_from = category, values_from = n) %>%
-  group_by(provider, sex) %>%
+adr_num <- adr_data |>
+  select(provider, sex, category) |>
+  count(provider, sex, category) |>
+  pivot_wider(names_from = category, values_from = n) |>
+  group_by(provider, sex) |>
   summarize(Numerator = sum(c(ta, ta_ssa)),
             .groups = "drop")
 
 # Calculate denominator (performance met + screening - performance not met)
-adr_den <- adr_data %>%
-  select(provider, sex, category) %>%
-  count(provider, sex, category) %>%
-  pivot_wider(names_from = category, values_from = n) %>%
-  group_by(provider, sex) %>%
+adr_den <- adr_data |>
+  select(provider, sex, category) |>
+  count(provider, sex, category) |>
+  pivot_wider(names_from = category, values_from = n) |>
+  group_by(provider, sex) |>
   summarize(Denominator = sum(c(ta, ta_ssa, screen)), 
             .groups = "drop")
 
 # Calculate ADR (serrated adenoma only results are excluded)
-adr <- adr_data %>%
-  select(provider, sex, category) %>%
-  count(provider, sex, category) %>%
-  pivot_wider(names_from = category, values_from = n) %>%
-  group_by(provider, sex) %>%
+adr <- adr_data |>
+  select(provider, sex, category) |>
+  count(provider, sex, category) |>
+  pivot_wider(names_from = category, values_from = n) |>
+  group_by(provider, sex) |>
   summarize(adr = (sum(c(ta, ta_ssa))) / (sum(c(ta, ta_ssa, screen))),
             .groups = "drop")
 
 # Merge numerator, denominator, and ADR into common table
-adr_table <- adr_num %>%
-  left_join(adr_den, by = c("provider", "sex")) %>%
-  left_join(adr, by = c("provider", "sex")) %>%
+adr_table <- adr_num |>
+  left_join(adr_den, by = c("provider", "sex")) |>
+  left_join(adr, by = c("provider", "sex")) |>
   rename(
     Provider = provider,
     Sex = sex,
     ADR = adr
-  ) %>% 
+  ) |> 
   ungroup()
 
 # Calculate SSADR for each provider as:
@@ -95,43 +95,43 @@ adr_table <- adr_num %>%
 #   divided by total screening colonoscopies
 
 # Calculate numerator (i.e., performance met + serrated adenomas)
-ssadr_num <- adr_data %>%
-  select(provider, sex, category) %>%
-  count(provider, sex, category) %>%
-  pivot_wider(names_from = category, values_from = n) %>%
-  group_by(provider, sex) %>%
+ssadr_num <- adr_data |>
+  select(provider, sex, category) |>
+  count(provider, sex, category) |>
+  pivot_wider(names_from = category, values_from = n) |>
+  group_by(provider, sex) |>
   summarize(Numerator = sum(c(ta_ssa, ssa)),
             .groups = "drop")
 
 # Calculate denominator (performance met + screening + serrated adenomas)
-ssadr_den <- adr_data %>%
-  select(provider, sex, category) %>%
-  count(provider, sex, category) %>%
-  pivot_wider(names_from = category, values_from = n) %>%
-  group_by(provider, sex) %>%
+ssadr_den <- adr_data |>
+  select(provider, sex, category) |>
+  count(provider, sex, category) |>
+  pivot_wider(names_from = category, values_from = n) |>
+  group_by(provider, sex) |>
   summarize(Denominator = sum(c(ta, ta_ssa, ssa, screen)),
             .groups = "drop")
 
 # Calculate SSADR (all serrated adenoma only results are included)
-ssadr <- adr_data %>%
-  select(provider, sex, category) %>%
-  count(provider, sex, category) %>%
-  pivot_wider(names_from = category, values_from = n) %>%
-  group_by(provider, sex) %>%
+ssadr <- adr_data |>
+  select(provider, sex, category) |>
+  count(provider, sex, category) |>
+  pivot_wider(names_from = category, values_from = n) |>
+  group_by(provider, sex) |>
   summarize(ssadr = (sum(c(ta_ssa, ssa))) / (sum(c(
     ta, ta_ssa, ssa, screen
   ))),
   .groups = "drop")
   
   # Merge numerator, denominator, and SSADR into common table
-  ssadr_table <- ssadr_num %>%
-  left_join(ssadr_den, by = c("provider", "sex")) %>%
-  left_join(ssadr, by = c("provider", "sex")) %>%
+  ssadr_table <- ssadr_num |>
+  left_join(ssadr_den, by = c("provider", "sex")) |>
+  left_join(ssadr, by = c("provider", "sex")) |>
   rename(
     Provider = provider,
     Sex = sex,
     SSADR = ssadr
-  ) %>% 
+  ) |> 
   ungroup() 
 ```
 
@@ -150,25 +150,25 @@ ssadr <- adr_data %>%
 <br>
 
 ```{r adr}
-adr_table %>% 
-  ungroup() %>% 
+adr_table |> 
+  ungroup() |> 
   gt(groupname_col = "Provider", 
      rowname_col = "Sex"
-  ) %>% 
+  ) |> 
   tab_header(
     title = md("**ADR All Screening Colonoscopies**")
-  ) %>% 
+  ) |> 
   fmt_percent(
     columns = "ADR",
     decimals = 2
-  ) %>% 
+  ) |> 
   cols_align(
     align = "right",
     columns = everything()
-  ) %>% 
+  ) |> 
   tab_source_note(
     source_note = md("*All diagnoses were rendered by Pathologists of Summit Pathology from specimens provided by Harmony Surgery Center. Records of all screening colonoscopies were provided to Summit Pathology by Harmony Surgery Center. ADR was calculated in accordance with the 2018 CMS Guidelines (qpp.cms.gov/docs/QPP_quality_measure_specifications/Claims-Registry-Measures/2018_Measure_343_Registry.pdf).*")
-  ) %>% 
+  ) |> 
   tab_options(
     summary_row.padding = px(2),
     row_group.font.weight = "bold",
@@ -182,25 +182,25 @@ adr_table %>%
 <br><br><br>
 
 ```{r}
-ssadr_table %>% 
-  ungroup() %>% 
+ssadr_table |> 
+  ungroup() |> 
   gt(groupname_col = "Provider", 
      rowname_col = "Sex"
-  ) %>% 
+  ) |> 
   tab_header(
     title = md("**SSADR for All Screening Colonoscopies**")
-  ) %>% 
+  ) |> 
   fmt_percent(
     columns = "SSADR",
     decimals = 2
-  ) %>% 
+  ) |> 
   cols_align(
     align = "right",
     columns = everything()
-  ) %>% 
+  ) |> 
   tab_source_note(
     source_note = md("*All diagnoses were rendered by Pathologists of Summit Pathology from specimens provided by Harmony Surgery Center. Records of all screening colonoscopies were provided to Summit Pathology by Harmony Surgery Center. SSADR was calculated in accordance with the 2018 CMS Guidelines (qpp.cms.gov/docs/QPP_quality_measure_specifications/Claims-Registry-Measures/2018_Measure_343_Registry.pdf).*")
-  ) %>% 
+  ) |> 
   tab_options(
     summary_row.padding = px(2),
     row_group.font.weight = "bold",
