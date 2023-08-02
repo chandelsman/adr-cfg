@@ -7,14 +7,14 @@ output:
 params:
   year:
     label: Year
-    value: 2022
+    value: 2023
     input: numeric
     min: 2000
     max: 2099
     step: 1
   quarter:
     label: Quarter
-    value: 3
+    value: 1
     input: numeric
     min: 1
     max: 4
@@ -49,21 +49,21 @@ library(here)
 client_raw <-
   list.files(path = here("data"),
              pattern = "(\\d){4}\\D\\d-\\D\\d{2}\\.\\d+\\.csv",
-             full.names = TRUE) %>%
-  sapply(readr::read_csv, simplify = FALSE) %>%
+             full.names = TRUE) |>
+  sapply(readr::read_csv, simplify = FALSE) |>
   bind_rows()
 
 client_clean <-
-  client_raw %>%
+  client_raw |>
   mutate(
     dob_client = mdy(`Date of Birth`),
     match_name = str_extract(client_raw$`Patient Name`, "^.*,\\s..."),
     provider = `Provider Name`,
     dos_client = date(mdy_hm(`Exam Date`)),
     age = as.period(interval(start = dob_client, end = dos_client))$year
-  ) %>%
-  rename(sex = Gender) %>%
-  filter(age >= 50) %>%
+  ) |>
+  rename(sex = Gender) |>
+  filter(age >= 50) |>
   select(provider, match_name, dos_client, dob_client, age, sex)
 ```
 
@@ -72,8 +72,8 @@ client_clean <-
 ligo_raw <-
   list.files(path = here("data"),
              pattern = "(\\d){4}\\D\\d-ligo",
-             full.names = TRUE) %>%
-  sapply(readxl::read_excel, simplify = FALSE) %>%
+             full.names = TRUE) |>
+  sapply(readxl::read_excel, simplify = FALSE) |>
   bind_rows()
 
 # Filter data to include relevant locations/clients
@@ -82,7 +82,7 @@ ligo_raw <-
 # Filter cases performed for CFG Harmony Surgery Center -----
 # client is CFG (HARMONY), CFG (PROESS AT SUMMIT), or HARMONY SURGERY CENTER
 ligo_harmony <-
-  ligo_raw %>%
+  ligo_raw |>
   filter(str_detect(
     client,
     regex("cfg \\(h.*|cfg \\(p|harmony surgery.*", ignore_case = TRUE)
@@ -90,7 +90,7 @@ ligo_harmony <-
 
 # separate provider last name, patient name to title case, filter age >= 50 
 ligo_clean <-
-  ligo_harmony %>%
+  ligo_harmony |>
   mutate(
     dob_ligo = mdy(dob),
     dos_ligo = mdy(dos),
@@ -98,12 +98,12 @@ ligo_clean <-
     match_name = str_to_title(name),
     provider = str_to_title(doctor),
     colon = grepl("colon", diagnosis, ignore.case = TRUE)
-  ) %>%
+  ) |>
   separate(provider,
            c("provider", "f_name"),
            sep = " ",
-           extra = "drop") %>%
-  filter(age >= 50, colon == TRUE) %>%
+           extra = "drop") |>
+  filter(age >= 50, colon == TRUE) |>
   select(-c(age, sex, provider, dob, dos, client, doctor, name, f_name, colon))
 ```
 
@@ -111,11 +111,14 @@ ligo_clean <-
 ```{r merge datasets, include=FALSE}
 # Resulting dataset includes **all** screening colonoscopies
 colonoscopy <-
-  client_clean %>%
+  client_clean |>
   left_join(ligo_clean,
-            by = c("match_name" = "match_name", "dos_client" = "dos_ligo")) %>%
+            join_by(
+              "match_name" == "match_name",
+              "dob_client" == "dob_ligo",
+              "dos_client" == "dos_ligo")) |>
   mutate(yr = year(dos_client),
-         qtr = quarter(dos_client)) %>%
+         qtr = quarter(dos_client)) |>
   filter(yr == params$year & qtr == params$quarter)
 ```
 
@@ -154,7 +157,7 @@ neg_results <-
   )
 
 colon_class <-
-  colonoscopy %>%
+  colonoscopy  |>
   mutate(
     diagnosis =
       str_replace_all(diagnosis, regex(neg_results, ignore_case = TRUE),
