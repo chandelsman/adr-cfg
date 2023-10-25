@@ -24,9 +24,9 @@ Files from Cassie will be named Z12.11.xlsx and Z80.0.xlsx
 Query is performed in LigoLab
 
 - Reporting > Dynamic Reports > CFG Quarterly ADR
-    - Collected =  Last Quarter
-    - Result ID prefix = "*SURG (CFG)" and "SURG OP (SP)"
-    - export results as “YYYYqX-ligo.xls” to IT > Projects > adr-cfg > data
+- Collected =  Last Quarter
+- Result ID prefix = "*SURG (CFG)" and "SURG OP (SP)"
+- export results as “YYYYqX-ligo.xls” to IT > Projects > adr-cfg > data
 
 ## Output
 
@@ -37,7 +37,7 @@ Query is performed in LigoLab
 - adjust column widths and text wrapping so diagnosis can be read
 - filter to show cases where the category is "evaluate"
 - read the diagnosis and assign "ta", "ta_ssa", "ssa", "carcinoma", or "screen"
-    - note that **site must be colon!** Other GI site diagnoses will be in the dataset
+  - note that **site must be colon!** Other GI site diagnoses will be in the dataset
 - save file and proceed to next step: Produce Report
 
 ### Produce Report
